@@ -5,11 +5,13 @@ description = "Like datetime, but fast"
 keywords = ["datetime", "parsing", "iso8601", "rfc3339"]
 requires-python = ">=3.7"
 readme = "README.md"
-license = "MIT OR Apache-2.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python"
 ]
+
+[project.license]
+text = "MIT OR Apache-2.0"
 
 [project.urls]
 homepage = "github.com/m1so/fastdatetime"

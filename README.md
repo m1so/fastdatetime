@@ -10,6 +10,9 @@ Like `datetime`, but fast 🚀
 [FAQ](#faq) •
 [Acknowledgements](#acknowledgements)
 
+![PyPI](https://img.shields.io/pypi/v/fastdatetime?label=pypi&logo=pypi&style=flat-square)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-informational?style=flat-square)](COPYRIGHT.md)
+
 </div>
 
 ## Implementation
@@ -45,3 +48,16 @@ TBD
 
 * [pyo3](https://github.com/PyO3/pyo3) for Python bindings
 * [maturin](https://github.com/PyO3/maturin) for building Python wheels
+
+## License
+
+&copy; 2022 Contributors of Project fastdatetime.
+
+This project is licensed under either of
+
+- [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) ([`LICENSE-APACHE`](LICENSE-APACHE))
+- [MIT license](https://opensource.org/licenses/MIT) ([`LICENSE-MIT`](LICENSE-MIT))
+
+at your option.
+
+The [SPDX](https://spdx.dev) license identifier for this project is `MIT OR Apache-2.0`.
