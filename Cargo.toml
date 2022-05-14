@@ -1,0 +1,27 @@
+[package]
+name = "fastdatetime"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fastdatetime"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = {version = "~0.16", features = ["extension-module"]}
+chrono = "~0.4"
+time = {version = "~0.3", features = ["parsing", "formatting"]}
+time-fmt = "~0.3.6"
+time-tz = "~0.5"
+dtparse = "1.2.0"
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+tikv-jemallocator = "0.4.3"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+
+[package.metadata.maturin]
+python-source = "python"
