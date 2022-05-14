@@ -25,3 +25,4 @@ opt-level = 3
 
 [package.metadata.maturin]
 python-source = "python"
+project-url = { homepage = "https://github.com/m1so/fastdatetime" }
