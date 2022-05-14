@@ -16,7 +16,7 @@ time-tz = "~0.5"
 dtparse = "1.2.0"
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
-tikv-jemallocator = "0.4.3"
+tikv-jemallocator = {version = "0.4.3", features = ["disable_initial_exec_tls", "background_threads_runtime_support"]}
 
 [profile.release]
 lto = "fat"
