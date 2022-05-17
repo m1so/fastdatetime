@@ -65,7 +65,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-        target: [x64, x86]
+        target: [x64]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -170,6 +170,12 @@ jobs:
             target: aarch64
     steps:
     - uses: actions/checkout@v2
+    - name: Set environment variables
+      run: |
+        echo "${{ matrix.target }}"
+        if [[ ${{ matrix.target }} == aarch64 ]]; then
+          echo "JEMALLOC_SYS_WITH_LG_PAGE=14" >> $GITHUB_ENV
+        fi
     - name: Build Python wheels
       uses: messense/maturin-action@v1
       env:
