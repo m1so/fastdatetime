@@ -4,12 +4,6 @@ use pyo3::prelude::*;
 use time_fmt::parse::{parse_date_time_maybe_with_zone, TimeZoneSpecifier};
 use time_tz::{Offset, TimeZone};
 
-// Using Jemalloc to gain 13 - 17% performance improvement on Rust side, while
-// LD_PRELOAD=/usr/local/lib/libjemalloc.so on Python side yields ~5% speed up
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
-
 mod datetime_utils;
 mod interop;
 

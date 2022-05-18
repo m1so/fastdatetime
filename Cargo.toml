@@ -1,6 +1,6 @@
 [package]
 name = "fastdatetime"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 [lib]
@@ -14,9 +14,6 @@ time = {version = "~0.3", features = ["parsing", "formatting"]}
 time-fmt = "~0.3.6"
 time-tz = "~0.5"
 dtparse = "1.2.0"
-
-[target.'cfg(not(target_env = "msvc"))'.dependencies]
-tikv-jemallocator = {version = "0.4.3", features = ["disable_initial_exec_tls", "background_threads_runtime_support"]}
 
 [profile.release]
 lto = "fat"
