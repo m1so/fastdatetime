@@ -170,12 +170,6 @@ jobs:
             target: aarch64
     steps:
     - uses: actions/checkout@v2
-    - name: Set environment variables
-      run: |
-        echo "${{ matrix.target }}"
-        if [[ ${{ matrix.target }} == aarch64 ]]; then
-          echo "JEMALLOC_SYS_WITH_LG_PAGE=16" >> $GITHUB_ENV
-        fi
     - name: Build Python wheels
       uses: messense/maturin-action@v1
       env:
