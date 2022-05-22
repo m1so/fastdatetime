@@ -1,16 +1,34 @@
 use chrono::format::{parse, Parsed, StrftimeItems};
 
-use pyo3::prelude::*;
+use pyo3::{once_cell::GILOnceCell, prelude::*};
 use time_fmt::parse::{parse_date_time_maybe_with_zone, TimeZoneSpecifier};
 use time_tz::{Offset, TimeZone};
 
 mod datetime_utils;
 mod interop;
 
-#[pyfunction]
+static DEFAULT_PARSER: GILOnceCell<dtparse::Parser> = GILOnceCell::new();
+
+#[pyfunction(date_string, "/", "*", dayfirst = "false", yearfirst = "false")]
 #[pyo3(name = "parse")]
-fn parse_from_py(date_string: &str) -> PyResult<interop::DateTimeWrapper> {
-    let (datetime, _offset) = dtparse::parse(date_string)
+fn parse_from_py(
+    py: Python<'_>,
+    date_string: &str,
+    dayfirst: Option<bool>,
+    yearfirst: Option<bool>,
+) -> PyResult<interop::DateTimeWrapper> {
+    let (datetime, _offset, _tokens) = DEFAULT_PARSER
+        .get_or_init(py, || dtparse::Parser::default())
+        .parse(
+            date_string,
+            dayfirst,
+            yearfirst,
+            false,
+            false,
+            None,
+            false,
+            &std::collections::HashMap::new(),
+        )
         .map_err(|parse_error| pyo3::exceptions::PyValueError::new_err(parse_error.to_string()))?;
 
     Ok(interop::DateTimeWrapper::NaiveDateTime(datetime))
