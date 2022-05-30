@@ -53,10 +53,16 @@ def test_chrono_conformance(strptime_format, input_string, ignore):
     "strptime_format,input_string,ignore",
     _COMMON_CASES + [
         ("%Y-%m-%d %H:%M:%S %z", "2018-12-05 12:30:45 +0100", None),
-        # [note] the seconds from tz offset get aligned to UTC correctly, just not in Python for some reason :shrug:
-        ("%Y-%m-%d %H:%M:%S %z", "2018-12-05 12:30:45 +010030", ["second"]),
         pytest.param("%Y-%m-%d %H:%M:%S.%f", "2018-12-05 12:30:45.123456", ["microsecond"]),
     ],
 )
 def test_time_conformance(strptime_format, input_string, ignore):
     _assert_conforms(time_strptime, strptime_format, input_string, ignore)
+
+
+def test_unconsumed_input():
+    with pytest.raises(ValueError):
+        _ = std_strptime("2018-12-05 12:30:45 +0100", "%Y-%m-%d %H:%M:%S")
+    
+    with pytest.raises(ValueError, match=r"Unconverted data remains:"):
+        _ = time_strptime("2018-12-05 12:30:45 +0100", "%Y-%m-%d %H:%M:%S")

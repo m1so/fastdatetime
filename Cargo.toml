@@ -1,6 +1,6 @@
 [package]
 name = "fastdatetime"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 
 [lib]
@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 pyo3 = {version = "~0.16", features = ["extension-module"]}
 chrono = "~0.4"
 time = {version = "~0.3", features = ["parsing", "formatting"]}
-time-fmt = "~0.3.6"
+time-fmt = "~0.3.7"
 time-tz = "~0.5"
 dtparse = "1.2.0"
 

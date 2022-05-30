@@ -1,6 +1,6 @@
 [project]
 name = "fastdatetime"
-version = "0.2.0"
+version = "0.3.0"
 description = "Like datetime, but fast"
 keywords = ["datetime", "parsing", "iso8601", "rfc3339"]
 requires-python = ">=3.7"

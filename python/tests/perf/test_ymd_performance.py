@@ -29,6 +29,19 @@ def test_ymd_fast_time(benchmark):
     assert result.day == 5
 
 
+def test_ymd_fast_time_loose(benchmark):
+    result: datetime = benchmark.pedantic(
+        fastdatetime.strptime_loose, 
+        args=("2018-12-05", "%Y-%m-%d"),
+        iterations=20_000, 
+        rounds=1_500,
+    )
+
+    assert result.year == 2018
+    assert result.month == 12
+    assert result.day == 5
+
+
 def test_ymd_fast_chrono(benchmark):
     result: datetime = benchmark.pedantic(
         fastdatetime.chrono.strptime, 
