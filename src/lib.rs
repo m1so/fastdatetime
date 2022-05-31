@@ -1,7 +1,9 @@
 use chrono::format::{parse, Parsed, StrftimeItems};
 
 use pyo3::{once_cell::GILOnceCell, prelude::*};
-use time_fmt::parse::{parse_date_time_maybe_with_zone, TimeZoneSpecifier};
+use time_fmt::parse::{
+    parse_date_time_maybe_with_zone, parse_strict_date_time_maybe_with_zone, TimeZoneSpecifier,
+};
 use time_tz::{Offset, TimeZone};
 
 mod datetime_utils;
@@ -93,8 +95,30 @@ fn strptime_from_py_chrono(
 #[pyfunction]
 #[pyo3(name = "strptime")]
 fn strptime_from_py_time_rs(date_string: &str, format: &str) -> PyResult<interop::DateTimeWrapper> {
+    _strptime_from_py_time_rs(date_string, format, true)
+}
+
+#[pyfunction]
+#[pyo3(name = "strptime_loose")]
+fn strptime_loose_from_py_time_rs(
+    date_string: &str,
+    format: &str,
+) -> PyResult<interop::DateTimeWrapper> {
+    _strptime_from_py_time_rs(date_string, format, false)
+}
+
+fn _strptime_from_py_time_rs(
+    date_string: &str,
+    format: &str,
+    strict: bool,
+) -> PyResult<interop::DateTimeWrapper> {
+    let parsing_fn = match strict {
+        true => parse_strict_date_time_maybe_with_zone,
+        false => parse_date_time_maybe_with_zone,
+    };
+
     // try to parse the string, otherwise raise ValueError
-    let (naive_dt, tz_spec) = parse_date_time_maybe_with_zone(format, date_string)
+    let (naive_dt, tz_spec) = parsing_fn(format, date_string)
         .map_err(|parse_error| pyo3::exceptions::PyValueError::new_err(parse_error.to_string()))?;
 
     let adjusted_dt = match tz_spec {
@@ -130,6 +154,7 @@ fn fastdatetime(py: Python<'_>, module: &PyModule) -> PyResult<()> {
 
     module.add_function(wrap_pyfunction!(parse_from_py, module)?)?;
     module.add_function(wrap_pyfunction!(strptime_from_py_time_rs, module)?)?;
+    module.add_function(wrap_pyfunction!(strptime_loose_from_py_time_rs, module)?)?;
 
     Ok(())
 }
