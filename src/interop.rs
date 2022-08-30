@@ -3,56 +3,57 @@ use chrono::prelude::*;
 use pyo3::prelude::*;
 use pyo3::types::PyDateTime;
 
-pub enum DateTimeWrapper {
-    NaiveDate(chrono::NaiveDate),
-    NaiveDateTime(chrono::NaiveDateTime),
-    PrimitiveDateTime(time::PrimitiveDateTime),
+pub(crate) trait TryIntoPy<T>: Sized {
+    fn try_into_py(self, py: Python) -> PyResult<T>;
 }
 
-impl ToPyObject for DateTimeWrapper {
-    fn to_object(&self, py: Python) -> PyObject {
-        match self {
-            DateTimeWrapper::NaiveDate(date) => PyDateTime::new(
-                py,
-                date.year(),
-                date.month() as u8,
-                date.day() as u8,
-                0,
-                0,
-                0,
-                0,
-                None,
-            ),
-            DateTimeWrapper::NaiveDateTime(datetime) => PyDateTime::new(
-                py,
-                datetime.year(),
-                datetime.month() as u8,
-                datetime.day() as u8,
-                datetime.hour() as u8,
-                datetime.minute() as u8,
-                datetime.second() as u8,
-                datetime.nanosecond() / 1000u32,
-                None,
-            ),
-            DateTimeWrapper::PrimitiveDateTime(datetime) => PyDateTime::new(
-                py,
-                datetime.year(),
-                datetime.month() as u8,
-                datetime.day(),
-                datetime.hour(),
-                datetime.minute(),
-                datetime.second(),
-                datetime.microsecond(),
-                None,
-            ),
-        }
-        .expect("Failed to construct datetime")
-        .into()
+impl TryIntoPy<PyObject> for chrono::NaiveDate {
+    fn try_into_py(self, py: Python) -> PyResult<PyObject> {
+        PyDateTime::new(
+            py,
+            self.year(),
+            self.month() as u8,
+            self.day() as u8,
+            0,
+            0,
+            0,
+            0,
+            None,
+        )
+        .map(|dt| dt.into_py(py))
     }
 }
 
-impl IntoPy<PyObject> for DateTimeWrapper {
-    fn into_py(self, py: Python) -> PyObject {
-        ToPyObject::to_object(&self, py)
+impl TryIntoPy<PyObject> for chrono::NaiveDateTime {
+    fn try_into_py(self, py: Python) -> PyResult<PyObject> {
+        PyDateTime::new(
+            py,
+            self.year(),
+            self.month() as u8,
+            self.day() as u8,
+            self.hour() as u8,
+            self.minute() as u8,
+            self.second() as u8,
+            self.nanosecond() / 1000u32,
+            None,
+        )
+        .map(|dt| dt.into_py(py))
+    }
+}
+
+impl TryIntoPy<PyObject> for time::PrimitiveDateTime {
+    fn try_into_py(self, py: Python) -> PyResult<PyObject> {
+        PyDateTime::new(
+            py,
+            self.year(),
+            self.month() as u8,
+            self.day(),
+            self.hour(),
+            self.minute(),
+            self.second(),
+            self.microsecond(),
+            None,
+        )
+        .map(|dt| dt.into_py(py))
     }
 }
