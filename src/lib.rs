@@ -9,6 +9,8 @@ use time_tz::{Offset, TimeZone};
 mod datetime_utils;
 mod interop;
 
+use interop::TryIntoPy;
+
 static DEFAULT_PARSER: GILOnceCell<dtparse::Parser> = GILOnceCell::new();
 
 #[pyfunction(date_string, "/", "*", dayfirst = "false", yearfirst = "false")]
@@ -18,7 +20,7 @@ fn parse_from_py(
     date_string: &str,
     dayfirst: Option<bool>,
     yearfirst: Option<bool>,
-) -> PyResult<interop::DateTimeWrapper> {
+) -> PyResult<PyObject> {
     let (datetime, _offset, _tokens) = DEFAULT_PARSER
         .get_or_init(py, || dtparse::Parser::default())
         .parse(
@@ -33,15 +35,12 @@ fn parse_from_py(
         )
         .map_err(|parse_error| pyo3::exceptions::PyValueError::new_err(parse_error.to_string()))?;
 
-    Ok(interop::DateTimeWrapper::NaiveDateTime(datetime))
+    Python::with_gil(|py| datetime.try_into_py(py))
 }
 
 #[pyfunction]
 #[pyo3(name = "strptime")]
-fn strptime_from_py_chrono(
-    date_string: &str,
-    mut format: String,
-) -> PyResult<interop::DateTimeWrapper> {
+fn strptime_from_py_chrono(date_string: &str, mut format: String) -> PyResult<PyObject> {
     // accounting for format difference between Python and Chrono results in ~20% perf hit
     // let chrono_format = format.replace(".%f", "%.f");
 
@@ -64,9 +63,7 @@ fn strptime_from_py_chrono(
 
     match parsed.to_datetime() {
         // all good, convert to "UTC aligned" datetime
-        Ok(datetime) => Ok(interop::DateTimeWrapper::NaiveDateTime(
-            datetime.naive_utc(),
-        )),
+        Ok(datetime) => Python::with_gil(|py| datetime.naive_utc().try_into_py(py)),
         // there was an error, let's try to convert to a partial datetime by setting defaults
         Err(_parse_error) => {
             let _ = parsed.set_nanosecond(0);
@@ -85,8 +82,8 @@ fn strptime_from_py_chrono(
             })?;
 
             match parsed.to_naive_time() {
-                Ok(time) => Ok(interop::DateTimeWrapper::NaiveDateTime(date.and_time(time))),
-                Err(_parse_error) => Ok(interop::DateTimeWrapper::NaiveDate(date)),
+                Ok(time) => Python::with_gil(|py| date.and_time(time).try_into_py(py)),
+                Err(_parse_error) => Python::with_gil(|py| date.try_into_py(py)),
             }
         }
     }
@@ -94,24 +91,17 @@ fn strptime_from_py_chrono(
 
 #[pyfunction]
 #[pyo3(name = "strptime")]
-fn strptime_from_py_time_rs(date_string: &str, format: &str) -> PyResult<interop::DateTimeWrapper> {
+fn strptime_from_py_time_rs(date_string: &str, format: &str) -> PyResult<PyObject> {
     _strptime_from_py_time_rs(date_string, format, true)
 }
 
 #[pyfunction]
 #[pyo3(name = "strptime_loose")]
-fn strptime_loose_from_py_time_rs(
-    date_string: &str,
-    format: &str,
-) -> PyResult<interop::DateTimeWrapper> {
+fn strptime_loose_from_py_time_rs(date_string: &str, format: &str) -> PyResult<PyObject> {
     _strptime_from_py_time_rs(date_string, format, false)
 }
 
-fn _strptime_from_py_time_rs(
-    date_string: &str,
-    format: &str,
-    strict: bool,
-) -> PyResult<interop::DateTimeWrapper> {
+fn _strptime_from_py_time_rs(date_string: &str, format: &str, strict: bool) -> PyResult<PyObject> {
     let parsing_fn = match strict {
         true => parse_strict_date_time_maybe_with_zone,
         false => parse_date_time_maybe_with_zone,
@@ -141,7 +131,7 @@ fn _strptime_from_py_time_rs(
         None => naive_dt,
     };
 
-    Ok(interop::DateTimeWrapper::PrimitiveDateTime(adjusted_dt))
+    Python::with_gil(|py| adjusted_dt.try_into_py(py))
 }
 
 #[pymodule]
