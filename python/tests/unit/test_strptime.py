@@ -53,3 +53,8 @@ def test_ymd():
     assert result.month == 12
     assert result.day == 5
     assert result.hour == 0
+
+
+def test_invalid_year():
+    with pytest.raises(ValueError):
+        fastdatetime.strptime("0-12-05", "%Y-%m-%d")
