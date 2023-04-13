@@ -1,6 +1,7 @@
 use chrono::format::{parse, Parsed, StrftimeItems};
 
-use pyo3::{once_cell::GILOnceCell, prelude::*};
+use pyo3::once_cell::GILOnceCell;
+use pyo3::prelude::*;
 use time_fmt::parse::{
     parse_date_time_maybe_with_zone, parse_strict_date_time_maybe_with_zone, TimeZoneSpecifier,
 };
@@ -13,8 +14,9 @@ use interop::TryIntoPy;
 
 static DEFAULT_PARSER: GILOnceCell<dtparse::Parser> = GILOnceCell::new();
 
-#[pyfunction(date_string, "/", "*", dayfirst = "false", yearfirst = "false")]
+#[pyfunction]
 #[pyo3(name = "parse")]
+#[pyo3(signature = (date_string, /, *, dayfirst=false, yearfirst=false))]
 fn parse_from_py(
     py: Python<'_>,
     date_string: &str,

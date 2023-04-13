@@ -1,6 +1,6 @@
 [package]
 name = "fastdatetime"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 
 [lib]
@@ -8,10 +8,10 @@ name = "fastdatetime"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = {version = "~0.16", features = ["extension-module"]}
-chrono = "~0.4"
-time = {version = "~0.3", features = ["parsing", "formatting"]}
-time-fmt = "~0.3.7"
+pyo3 = {version = "~0.18.2", features = ["extension-module"]}
+chrono = "~0.4.24"
+time = {version = "~0.3.20", features = ["parsing", "formatting"]}
+time-fmt = "~0.3.8"
 time-tz = "~0.5"
 dtparse = "1.2.0"
 
@@ -19,7 +19,3 @@ dtparse = "1.2.0"
 lto = "fat"
 codegen-units = 1
 opt-level = 3
-
-[package.metadata.maturin]
-python-source = "python"
-project-url = { homepage = "https://github.com/m1so/fastdatetime" }
